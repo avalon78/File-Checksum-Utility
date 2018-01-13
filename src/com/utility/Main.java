@@ -1,48 +1,39 @@
 package com.utility;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class Main {
 
-    static final int CHUNK_SIZE = 4096;
 
     public static void main(String[] args) {
 
-
-        if (args.length == 0) return;
-
-        File file = new File(args[0]);
-
-        if (!file.isFile()) return;
-
-
-        try (FileInputStream fis = new FileInputStream(file);
-             DigestInputStream dis = new DigestInputStream(fis, MessageDigest.getInstance("SHA-1"))) {
-
-            byte[] fileBytes = new byte[CHUNK_SIZE];
-
-            while (dis.read(fileBytes, 0, fileBytes.length) != -1) {
-                //
-            }
-
-            byte[] hash = dis.getMessageDigest().digest();
-
-            StringBuilder hexHash = new StringBuilder();
-
-            for (int i = 0; i < hash.length; i++) {
-                hexHash.append(String.format("%02x", hash[i]));
-            }
-
-            System.out.print("CheckSum: " + hexHash);
-
-        } catch (IOException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
+        if (args.length == 0 || args.length > 1) {
+            System.out.println("" +
+                    "Usage: java -jar fcu.jar  file|directory" +
+                    "");
+            return;
         }
+
+        if (Util.checkValidFileOrPath(args[0])) {
+
+            //TODO: Add directory support
+
+            String hash = null;
+            try {
+                hash = Util.getFileCheckSum(args[0]);
+            } catch (IOException | NoSuchAlgorithmException e) {
+                e.printStackTrace();
+                return;
+            }
+
+            System.out.print("CheckSum: " + hash);
+
+        } else {
+            System.out.print("Error Message : File or directory doesn't exist in the specified path");
+        }
+
+
     }
 }
 
